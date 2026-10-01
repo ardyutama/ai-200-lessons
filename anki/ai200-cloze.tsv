@@ -1,0 +1,60 @@
+# Text<TAB>Back Extra<TAB>tags — import with Cloze note type
+Build an image in ACR without a local Docker daemon: {{c1::az acr build -r &lt;registry&gt; -t myimage:{{c2::v1}} .}}	ACR Tasks builds in the cloud from the local context.	ai200::containers cloze
+Deploy manifests to a cluster: {{c1::kubectl apply -f}} deployment.yaml	apply is declarative and idempotent.	ai200::containers cloze
+See why a crashed Pod died: kubectl logs &lt;pod&gt; {{c1::--previous}}	Reads the previous container instance's logs.	ai200::containers cloze
+Newest cluster warnings first: kubectl get events {{c1::--sort-by=.lastTimestamp}}		ai200::containers cloze
+Watch a rolling update: kubectl {{c1::rollout status}} deployment/myapp	Undo with: kubectl rollout undo deployment/myapp.	ai200::containers cloze
+KEDA ScaledObject that costs nothing when idle: minReplicaCount: {{c1::0}}	Pair with a queue-length scaler and a sane maxReplicaCount.	ai200::containers cloze
+Split traffic in Container Apps: az containerapp ingress traffic set --revision-weight {{c1::latest=80 previous=20}}	Requires multiple revision mode.	ai200::containers cloze
+App Service container on a custom port: set {{c1::WEBSITES_PORT}} to the container's listen port.		ai200::containers cloze
+Cosmos DB vector query: SELECT c.content FROM c ORDER BY RANK {{c1::VectorDistance}}(c.embedding, @qv)	Needs a vector embedding policy + vector index (diskANN for scale).	ai200::data cloze
+Cosmos DB Python entry point: CosmosClient(url, credential={{c1::key}}).get_database_client(db).{{c2::get_container_client}}(container)		ai200::data cloze
+Cheapest Cosmos DB read: a {{c1::point read}} using id + partition key (~1 RU per 1 KB)		ai200::data cloze
+Enable pgvector: CREATE EXTENSION {{c1::vector}};	On Flexible Server first set the azure.extensions server parameter.	ai200::data cloze
+Cosine similarity search in pgvector: ORDER BY embedding {{c1::&lt;=&gt;}} $1 LIMIT 5	&lt;-&gt; = L2, &lt;#&gt; = inner product.	ai200::data cloze
+HNSW index on embeddings: CREATE INDEX ON docs USING {{c1::hnsw}} (embedding {{c2::vector_cosine_ops}});	Ops class must match the distance operator.	ai200::data cloze
+Tune IVFFlat at query time: SET ivfflat.{{c1::probes}} = 10;	Build-time knob is "lists"; build the index after data load.	ai200::data cloze
+RAG with metadata filter: SELECT content FROM docs WHERE {{c1::tenant_id = $2}} ORDER BY embedding &lt;=&gt; $1 LIMIT 5;	Filter in SQL, not in app code.	ai200::data cloze
+Cache-aside write with TTL: SET user:42 "{{c1::value}}" {{c2::EX 300}}	Delete the key on DB writes to invalidate.	ai200::data cloze
+Redis set-if-absent lock: SET lock:job token {{c1::NX}} EX 30		ai200::data cloze
+RediSearch vector index: FT.CREATE idx ON HASH SCHEMA embedding VECTOR {{c1::HNSW}} 6 TYPE FLOAT32 DIM {{c2::1536}} DISTANCE_METRIC COSINE		ai200::data cloze
+RediSearch KNN query: FT.SEARCH idx "{{c1::*=&gt;[KNN 5 @embedding $vec]}}" PARAMS 2 vec &lt;blob&gt; DIALECT {{c2::2}}		ai200::data cloze
+Send to Service Bus in Python: client.get_queue_sender(q).send_messages({{c1::ServiceBusMessage}}("body"))		ai200::integration cloze
+Settle a processed message (PeekLock): receiver.{{c1::complete_message}}(msg)	Alternatives: abandon_message, dead_letter_message, defer_message.	ai200::integration cloze
+A message moves to the DLQ after {{c1::MaxDeliveryCount}} failed deliveries (default 10)	Also: expired TTL, filter errors, explicit dead-letter.	ai200::integration cloze
+Python v2 HTTP function: @app.route(route="hello", auth_level=func.AuthLevel.{{c1::ANONYMOUS}})		ai200::integration cloze
+Timer trigger every 5 minutes (NCRONTAB, seconds first): {{c1::0 */5 * * * *}}	6 fields; UTC by default.	ai200::integration cloze
+Event Grid dead-letters failed events to a {{c1::storage blob container}}	Retry default: ~30 attempts over 24h, exponential backoff.	ai200::integration cloze
+Function app deploy: func azure functionapp publish {{c1::&lt;app-name&gt;}}		ai200::integration cloze
+Retrieve a Key Vault secret: SecretClient(vault_url, credential).{{c1::get_secret}}("db-password").{{c2::value}}		ai200::ops cloze
+Key Vault reference in an app setting: {{c1::@Microsoft.KeyVault(SecretUri=https://vault/secrets/name)}}		ai200::ops cloze
+App Config live refresh works by changing the {{c1::sentinel}} key	Provider reloads config only when the sentinel changes.	ai200::ops cloze
+Open a traced operation: with tracer.{{c1::start_as_current_span}}("process-message"):		ai200::ops cloze
+Point OTel at a local collector: OTEL_EXPORTER_OTLP_ENDPOINT={{c1::http://localhost:4318}}	Jaeger UI on :16686.	ai200::ops cloze
+Trace context travels between services in the {{c1::traceparent}} header (W3C Trace Context)		ai200::ops cloze
+KQL, last hour: traces | where timestamp {{c1::> ago(1h)}}		ai200::ops cloze
+KQL, count per 5-minute bucket: requests | summarize {{c1::count()}} by {{c2::bin(timestamp, 5m)}}		ai200::ops cloze
+KQL, top talkers: ... | summarize count() by user_Id | {{c1::top 10 by count_ desc}}		ai200::ops cloze
+KQL, p95 latency per dependency: dependencies | summarize {{c1::percentile(duration, 95)}} by target | order by ... desc		ai200::ops cloze
+KQL, whole-term match (fast): where message {{c1::has}} "timeout"	contains = substring (slower).	ai200::ops cloze
+KQL, chart it: ... | render {{c1::timechart}}		ai200::ops cloze
+Start the local Azure emulator and load env: floci az start && eval $(floci {{c1::az env}})	Services on :4577; Service Bus AMQP on :5673.	ai200::integration cloze
+Create a local k8s cluster for manifest practice: {{c1::kind create cluster}} --name ai200	Teardown: kind delete cluster --name ai200.	ai200::containers cloze
+List floci-az SDK endpoints: eval $(floci az env {{c1::--format sdk-vars}})	Exports AZURE_KEY_VAULT_ENDPOINT, AZURE_APP_CONFIGURATION_ENDPOINT, ...	ai200::ops cloze
+Get AKS credentials for kubectl: az aks {{c1::get-credentials}} -g &lt;rg&gt; -n &lt;cluster&gt;	Merges into ~/.kube/config.	ai200::containers cloze
+Stop scheduling on a node, then evict its Pods: kubectl {{c1::cordon}} &lt;node&gt;; kubectl {{c2::drain}} &lt;node&gt; --ignore-daemonsets		ai200::containers cloze
+Cosmos DB change feed (pull model) in Python: container.{{c1::query_items_change_feed}}()		ai200::data cloze
+Half-precision pgvector column: embedding {{c1::halfvec}}(1536)	Halves memory/index size.	ai200::data cloze
+HNSW recall at query time: SET hnsw.{{c1::ef_search}} = 100;	Higher = more recall, more compute.	ai200::data cloze
+Invalidate a cached key on write: {{c1::DEL}} user:42		ai200::data cloze
+Batch Redis calls in redis-py: pipe = r.{{c1::pipeline}}()	One round trip for many commands.	ai200::data cloze
+Send a poison message to the Service Bus DLQ: receiver.{{c1::dead_letter_message}}(msg, reason="poison")		ai200::integration cloze
+Service Bus filter that exact-matches application properties efficiently: {{c1::correlation}} filter	SQL filters are the flexible alternative.	ai200::integration cloze
+Declarative queue write in a v2 Function: @app.{{c1::queue_output}}(queue_name="out", connection="...")		ai200::integration cloze
+Local-only Function settings file: {{c1::local.settings.json}}	Never commit it; in Azure these become app settings / Key Vault references.	ai200::integration cloze
+Event Grid retry knobs: {{c1::maxDeliveryAttempts}} and {{c2::eventTimeToLive}}	Defaults ≈ 30 attempts / 24h.	ai200::integration cloze
+Create a new secret version in Key Vault: client.{{c1::set_secret}}("name", "new-value")		ai200::ops cloze
+Feature flag keys in App Configuration live under the prefix {{c1::.appconfig.featureflag/}}		ai200::ops cloze
+The OTel component that exports finished spans: {{c1::SpanProcessor}} + exporter (e.g. OTLP HTTP)		ai200::ops cloze
+KQL unnest a dynamic array: {{c1::mv-expand}}		ai200::ops cloze
+KQL reusable variable: {{c1::let}} cutoff = ago(1d);		ai200::ops cloze
