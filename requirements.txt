@@ -1,0 +1,18 @@
+# AI-200 local prep — lab dependencies (canonical list; SETUP.md §1 installs from here)
+# Azure SDK (Labs 01, 04, 06)
+azure-cosmos
+azure-servicebus
+azure-storage-blob
+azure-keyvault-secrets
+azure-appconfiguration
+azure-identity
+# Data (Labs 02, 03)
+psycopg[binary,pool]
+redis
+# Telemetry (Lab 07)
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-http
+# Anki deck build
+genanki
+# Lab 01 vector snippets
+numpy

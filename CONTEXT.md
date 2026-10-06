@@ -24,6 +24,14 @@ _Avoid_: note (Anki-internal term), question (that is Mock territory)
 A hands-on exercise in `labs/` that runs entirely locally — against floci-az or another local runtime — and is completable without an Azure subscription.
 _Avoid_: tutorial, walkthrough, exercise
 
+**Solution**:
+The answer key for a Lab, in `labs/<lab>/SOLUTION.md`. Each Lab step is rephrased as an exam-style question, followed by the answer, a runnable per-step snippet, and a why/trap note. A Lab's first pass may consult its Solution; the two runs counted toward Solid Practice must be done with it closed.
+_Avoid_: answer sheet, cheat sheet
+
+**Case Thread**:
+A single running scenario carried through every block of a Solution, so snippets read as one realistic job rather than isolated demos (Lab 02: SupportBrain, a multi-tenant support-docs RAG for tenants `contoso`/`fabrikam`). Device exists to anchor recall; reuse across Solutions when it fits.
+_Avoid_: narrative, story mode
+
 **floci-az**:
 The local Azure emulator (28 services, port 4577) used as the zero-cost Azure stand-in for Labs. Covers: Blob, Cosmos DB, PostgreSQL, Redis, Service Bus, Event Hubs, Functions, Key Vault, App Configuration, AKS (control-plane).
 

@@ -8,30 +8,27 @@ Everything below is for you to run (macOS, Homebrew already present). Nothing he
 # floci CLI (manages the floci-az Azure emulator)
 brew install floci-io/floci/floci
 
-# Azure CLI (used against floci-az endpoints)
-brew install azure-cli
+# Azure CLI + AWS CLI — mise-managed (standardized 2026-10-04; Homebrew is Python-free)
+mise use -g azure-cli aws-cli
 
 # kind — local Kubernetes for the AKS/manifests lab
 brew install kind
 
-# Python deps (isolated venv in this repo)
+# Python deps (isolated venv in this repo; interpreter provided by mise — the standard)
 cd ~/Documents/personal/ai-200-lessons
-python3 -m venv .venv
+mise install                    # ensures python 3.13 per mise.toml
+~/.local/share/mise/installs/python/3.13/bin/python3 -m venv .venv
 source .venv/bin/activate
-pip install --upgrade pip
-pip install \
-  azure-cosmos \
-  azure-servicebus \
-  azure-storage-blob \
-  azure-keyvault-secrets \
-  azure-appconfiguration \
-  azure-identity \
-  psycopg[binary] \
-  redis \
-  opentelemetry-sdk \
-  opentelemetry-exporter-otlp-proto-http \
-  genanki
+which python            # GUARD: must print .../ai-200-lessons/.venv/bin/python
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt   # canonical dep list: Labs 01–07 + Anki build
 ```
+
+> Division of responsibility (2026-10-04 cleanup): **mise** = the project's Python toolchain
+> (versions immutable per directory → venvs don't rot on upgrade; never `pip install` into a
+> mise Python directly); **.venv** = all project packages; **homebrew** Pythons remain only as
+> incidental formula dependencies (e.g. azure-cli) — do not build venvs from them. If a mise
+> upgrade bumps 3.13.x and you want it: delete `.venv`, rerun the venv line above.
 
 ## 2. Start the local Azure (floci-az)
 
