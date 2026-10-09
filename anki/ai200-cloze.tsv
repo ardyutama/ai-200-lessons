@@ -58,3 +58,9 @@ Feature flag keys in App Configuration live under the prefix {{c1::.appconfig.fe
 The OTel component that exports finished spans: {{c1::SpanProcessor}} + exporter (e.g. OTLP HTTP)		ai200::ops cloze
 KQL unnest a dynamic array: {{c1::mv-expand}}		ai200::ops cloze
 KQL reusable variable: {{c1::let}} cutoff = ago(1d);		ai200::ops cloze
+Redis TTL key returns {{c1::-1}} = key exists with no expiry; {{c2::-2}} = key does not exist		ai200::data cloze mock01
+Service Bus receive modes: {{c1::ReceiveAndDelete}} = at-most-once; {{c2::PeekLock}} = at-least-once	PeekLock completes only after successful processing.	ai200::integration cloze mock01
+ACR geo-replication requires the {{c1::Premium}} tier	Also gates private endpoints and content trust.	ai200::containers cloze mock01
+A function has exactly {{c1::one}} trigger (bindings can be many)	Two trigger entries = host indexing fails.	ai200::integration cloze mock01
+Cosmos DB change feed captures inserts and updates only — never {{c1::deletes}}	A PK change shows up as an insert of the new item.	ai200::data cloze mock01
+
