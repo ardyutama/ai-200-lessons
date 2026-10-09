@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec: 
+      containers:
+      - name: nginx
+        image: nginx:1.27
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi
+        livenessProbe:  
+          httpGet:
+            path: /
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        env:
+        - name: WELCOME_MESSAGE
+          valueFrom:
+            configMapKeyRef:
+              name: web-config
+              key: WELCOME_MESSAGE
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: web-secret
+              key: API_KEY
