@@ -237,4 +237,4 @@ D) Merges them into one
 | Q35 DLQ trigger set | Q22, Q24 |
 | Q41 one trigger per function | Q4, Q26 |
 
-For every miss here: re-read the matching study-guide bullet, redo the matching lab step, and flag the `mock01` tag in Anki. Pass this (≥26) before sitting full mock-02.
+For every miss here: re-read the matching study-guide bullet, redo the matching lab step, and flag the `mock01` tag in Anki. Pass this (≥26) before sitting full [mock-02](mock-02.md).

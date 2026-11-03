@@ -236,10 +236,10 @@ A) Filters to 5-minute-old rows  B) Floors timestamps into 5-minute buckets for 
 
 | Domain | Questions | Your score | Target |
 |---|---|---|---|
-| containers | Q6–17, 52, 54 | __ / 15 | ≥ 13 |
+| containers | Q6–17, 52, 54 | __ / 14 | ≥ 12 |
 | data | Q1–2, 18–32, 51 | __ / 18 | ≥ 15 |
 | integration | Q3, 33–44, 53 | __ / 14 | ≥ 12 |
-| ops | Q4–5, 45–50 | __ / 7 | ≥ 6 |
+| ops | Q4–5, 45–50 | __ / 8 | ≥ 7 |
 | **Total** | | __ / 54 | **≥ 46 (85%)** |
 
 For every miss: re-read the matching study-guide bullet, redo the matching lab step, and flag the tag in Anki for tomorrow's cram.

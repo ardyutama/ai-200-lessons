@@ -1,6 +1,6 @@
 # AI-200 Exam Prep
 
-Glossary for a 10-day preparation project targeting Microsoft Exam AI-200 (Azure AI Cloud Developer Associate). Exam date: 2026-10-10.
+Glossary for the preparation project targeting Microsoft Exam AI-200 (Azure AI Cloud Developer Associate). Attempt 1: 2026-10-10 (649/1000, fail — brain-dump in notes/). Retake: 2026-11-14.
 
 ## Language
 
@@ -13,7 +13,7 @@ AI-200T00-A, the 5-day Microsoft Learn course aligned to the Exam; 9 self-paced 
 _Avoid_: learning path, lessons
 
 **Domain**:
-One of the four weighted skill areas from the official study guide, used as the organizing unit for Cards, Labs, and Mocks: `containers` (20–25%), `data` (25–30%), `integration` (20–25%), `ops` (20–25%).
+One of the four weighted skill areas from the official study guide, used as the organizing unit for Cards, Labs, and Mocks: `containers` (20–25%), `data` (25–30%), `integration` (20–25%), `ops` (20–25%). (Data briefly read 30–35% in Oct 2026; the live study guide reverted — re-check aka.ms/AI200-StudyGuide before the sitting.)
 _Avoid_: module, section, topic
 
 **Card**:
@@ -44,5 +44,5 @@ A timed practice exam in `mocks/`, generated from the study guide and mirroring 
 _Avoid_: practice test dump, cheat sheet
 
 **Solid Practice**:
-The agreed readiness bar: every Lab completed unaided twice, and ≥85% on the Mock by 2026-10-08.
+The agreed readiness bar: every Lab completed unaided twice, and ≥85% on the Mock before the sitting (attempt 1: mock-01 by 2026-10-08; retake: mock-02 by 2026-11-11).
 _Avoid_: "feeling ready", done

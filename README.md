@@ -1,6 +1,6 @@
 # ai-200-lessons
 
-10-day prep for **Microsoft Exam AI-200 — Developing AI Cloud Solutions on Azure** (Azure AI Cloud Developer Associate). Exam: **2026-10-10**.
+10-day prep for **Microsoft Exam AI-200 — Developing AI Cloud Solutions on Azure** (Azure AI Cloud Developer Associate). Attempt 1: 2026-10-10 (fail, 649/1000). Retake: **2026-11-14**.
 
 Start here:
 

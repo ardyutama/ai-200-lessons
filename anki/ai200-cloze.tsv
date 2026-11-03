@@ -1,5 +1,5 @@
 # Text<TAB>Back Extra<TAB>tags — import with Cloze note type
-Build an image in ACR without a local Docker daemon: {{c1::az acr build -r &lt;registry&gt; -t myimage:{{c2::v1}} .}}	ACR Tasks builds in the cloud from the local context.	ai200::containers cloze
+Build an image in ACR without a local Docker daemon: {{c1::az acr build -r &lt;registry&gt; -t myimage:}}{{c2::v1}}.	ACR Tasks builds in the cloud from the local context.	ai200::containers cloze
 Deploy manifests to a cluster: {{c1::kubectl apply -f}} deployment.yaml	apply is declarative and idempotent.	ai200::containers cloze
 See why a crashed Pod died: kubectl logs &lt;pod&gt; {{c1::--previous}}	Reads the previous container instance's logs.	ai200::containers cloze
 Newest cluster warnings first: kubectl get events {{c1::--sort-by=.lastTimestamp}}		ai200::containers cloze
@@ -64,3 +64,118 @@ ACR geo-replication requires the {{c1::Premium}} tier	Also gates private endpoin
 A function has exactly {{c1::one}} trigger (bindings can be many)	Two trigger entries = host indexing fails.	ai200::integration cloze mock01
 Cosmos DB change feed captures inserts and updates only — never {{c1::deletes}}	A PK change shows up as an insert of the new item.	ai200::data cloze mock01
 
+# AI-200 retake append file (cloze) — 10 batches, weak-skill-first order.
+# Append to anki/ai200-cloze.tsv then rebuild with build_apkg.py. Appending only; do not edit existing rows.
+# Text<TAB>Back Extra<TAB>tags — import with Cloze note type
+# ---------- retake batch: servicebus (retake1) ----------
+Keep a long-running PeekLock alive without manual renewal: renewer = AutoLockRenewer(); renewer.{{c1::register}}(receiver, msg, max_lock_renewal_duration=600)	Renews in the background until the duration elapses or the message is settled.	ai200::integration cloze retake1
+Receive from a queue's dead-letter sub-queue: client.get_queue_receiver(queue_name=q, sub_queue=ServiceBusSubQueue.{{c1::DEAD_LETTER}})	Avoids manually building the &lt;queue&gt;/$deadletterqueue path.	ai200::integration cloze retake1
+Service Bus PeekLock duration: default {{c1::1 minute}}, configurable max {{c2::5 minutes}}.		ai200::integration cloze retake1
+Duplicate detection window: default {{c1::10 minutes}}, max {{c2::7 days}}.	Minimum allowed is 20 seconds.	ai200::integration cloze retake1
+Claim-check pattern: send only {{c1::the blob URI}} in the Service Bus message; the processor fetches the real payload from {{c2::Blob Storage}}.	Keeps messages small regardless of tier; avoids broker cost on large payloads.	ai200::integration cloze retake1
+Batch multiple Service Bus messages into one Functions invocation: cardinality = {{c1::many}} (Python: func.Cardinality.MANY)	Default is <code>one</code> &mdash; a single message per invocation.	ai200::integration cloze functions retake1
+Service Bus Entra ID roles: {{c1::Data Sender}} = send only; {{c2::Data Receiver}} = receive only.	Data Owner = full access (also needed for admin/scale operations).	ai200::integration cloze rbac retake1
+A Service Bus transaction scope excludes {{c1::Receive}} (settle inside, receive outside) and times out after {{c2::2 minutes}}.	Allowed ops: Send, Complete, Abandon, Deadletter, Defer, RenewLock.	ai200::integration cloze transactions retake1
+Transient failure, worth retrying: receiver.{{c1::abandon_message}}(msg) &mdash; releases the lock and redelivers; permanent failure: dead_letter_message(msg, reason=...).	abandon increments DeliveryCount; dead_letter skips straight to the DLQ without waiting for MaxDeliveryCount.	ai200::integration cloze dlq retake1
+# Text	Back Extra	tags — import with Cloze note type
+# ---------- retake batch: eventgrid (retake1) ----------
+Create a custom Event Grid topic that accepts CloudEvents: <code>az eventgrid topic create -n t -g rg -l eastus {{c1::--input-schema}} {{c2::cloudeventschemav1_0}}</code>	Output schema on the subscription can still convert Event Grid&rarr;CloudEvents, but never the reverse.	ai200::integration cloze retake1
+Filter a subscription to one event type only: <code>az eventgrid event-subscription create ... {{c1::--included-event-types}} com.contoso.ai.ContentFlagged</code>	Combine with --subject-begins-with for AND-style narrowing.	ai200::integration cloze retake1
+Scope a subscription to one pipeline's events: <code>az eventgrid event-subscription create ... {{c1::--subject-begins-with}} /pipelines/embeddings</code>		ai200::integration cloze retake1
+Advanced filter matching several string values at once: <code>--advanced-filter data.status {{c1::StringIn}} flagged pending</code>	StringIn is exact match against any listed value; StringContains matches substrings instead.	ai200::integration cloze retake1
+Cap retries tightly for a latency-sensitive handler: <code>--event-ttl {{c1::30}} --max-delivery-attempts {{c2::5}}</code>	TTL is in minutes (1-1440); attempts is a count (1-30) — whichever limit is hit first wins.	ai200::integration cloze retake1
+Point a subscription's dead-letter at Blob Storage: <code>--deadletter-endpoint {{c1::&lt;storage-account-id&gt;/blobServices/default/containers/&lt;container&gt;}}</code>	The container must already exist — Event Grid never creates it for you.	ai200::integration cloze retake1
+Authenticate EventGridPublisherClient with a managed identity instead of a key: <code>credential = {{c1::DefaultAzureCredential}}()</code>	The identity still needs the EventGrid Data Sender role on the topic.	ai200::integration cloze retake1
+Prove webhook ownership for the Event Grid schema's synchronous handshake: echo the code back in the <code>{{c1::validationResponse}}</code> property of your reply body	Or GET the validationUrl within 10 minutes for the asynchronous/manual path.	ai200::integration cloze retake1
+Event Hubs exposes a {{c1::Kafka}} protocol endpoint, so existing Kafka producer/consumer code runs with {{c2::no cluster}} to manage	AMQP 1.0 and HTTPS are also supported protocols on the same event hub.	ai200::integration cloze retake1
+# ---------- retake batch: functions (retake1) ----------
+Python v2 retry for a Timer trigger, 3 tries 10s apart: @app.retry(strategy={{c1::&quot;fixed_delay&quot;}}, max_retry_count=3, delay_interval=&quot;00:00:10&quot;)	Only Cosmos DB, Event Hubs, Kafka and Timer triggers support this decorator.	ai200::integration cloze retake1
+Service Bus queue trigger, Python v2: @app.service_bus_queue_trigger(arg_name=&quot;msg&quot;, queue_name=&quot;jobs&quot;, connection={{c1::&quot;ServiceBusConnection&quot;}})	connection names an app setting prefix, not a literal connection string.	ai200::integration cloze retake1
+Cosmos DB trigger lease setup, Python v2: @app.cosmos_db_trigger(..., lease_container_name=&quot;leases&quot;, create_lease_container_if_not_exists={{c1::&quot;true&quot;}})	Without this, the leases container must already exist or the function fails to start.	ai200::integration cloze retake1
+host.json Service Bus concurrency: &quot;serviceBus&quot;: { &quot;maxConcurrentCalls&quot;: {{c1::1}}, &quot;maxAutoRenewDuration&quot;: &quot;00:05:00&quot; }	maxConcurrentCalls=1 gives one message the whole instance's resources -- good for heavy AI processing per message. maxAutoRenewDuration maps to the SDK's ServiceBusProcessor.MaxAutoLockRenewalDuration.	ai200::integration cloze retake1
+host.json Queue poison defaults: &quot;queues&quot;: { &quot;maxDequeueCount&quot;: {{c1::5}}, &quot;visibilityTimeout&quot;: &quot;{{c2::00:00:00}}&quot; }	Default visibilityTimeout of zero means a failed message reappears immediately.	ai200::integration cloze retake1
+Durable fan-out/fan-in aggregation: results = yield context.{{c1::task_all}}(tasks)	Returned list order matches the scheduled task order, even if activities finish out of order.	ai200::integration cloze retake1
+Durable human-interaction race: winner = yield context.{{c1::task_any}}([approval_task, timeout_task])	Whichever task settles first wins; cancel the other (e.g. the timer) if it supports cancellation.	ai200::integration cloze retake1
+Durable activity retry: yield context.call_activity_with_retry(&quot;process_document&quot;, df.RetryOptions(first_retry_interval_in_milliseconds=5000, max_number_of_attempts={{c1::3}}), input)	Activities are at-least-once regardless -- pair retries with an idempotent write.	ai200::integration cloze retake1
+Durable async HTTP API: the 202 response's Location header value is the {{c1::statusQueryGetUri}}, alongside sendEventPostUri, terminatePostUri and purgeHistoryDeleteUri.	Also called the polling consumer pattern.	ai200::integration cloze retake1
+Identity-based Service Bus connection (no connection string): {{c1::ServiceBusConnection__fullyQualifiedNamespace}} = mynamespace.servicebus.windows.net	Pair with role Azure Service Bus Data Receiver (trigger) or Data Sender (output binding).	ai200::integration cloze retake1
+# Text	Back Extra	tags — import with Cloze note type
+# ---------- retake batch: acr-appservice (retake1) ----------
+Lock a production ACR tag against delete/overwrite: az acr repository update --image repo:tag --{{c1::write-enabled false}}	Unlock later with --write-enabled true when retiring the tag.	ai200::containers cloze retake1
+Execute an EXISTING ACR image for a cloud-hosted smoke test (no new build): az acr {{c1::run}} --registry myreg --cmd "api:v1 pytest" /dev/null	az acr build builds a new image from source; az acr run just executes one already in the registry.	ai200::containers cloze retake1
+Copy nginx:latest from Docker Hub straight into ACR, no local docker pull/push: az acr {{c1::import}} --name myreg --source docker.io/library/nginx:latest --image nginx:latest	Needs the Container Registry Data Importer and Data Reader role; works on every SKU tier.	ai200::containers cloze retake1
+Switch App Service to pull from ACR with managed identity instead of the admin account: az webapp config set --generic-configurations '{"{{c1::acrUseManagedIdentityCreds}}": true}'	The identity still needs the AcrPull role on the registry granted separately.	ai200::containers cloze retake1
+Persist a Linux custom container's /home writes across restarts (off by default): {{c1::WEBSITES_ENABLE_APP_SERVICE_STORAGE}}=true	Windows custom containers have this ON by default instead &mdash; opposite default.	ai200::containers cloze retake1
+An unversioned Key Vault reference in App Service re-resolves a rotated secret within about {{c1::24}} hours on its own, or immediately after an app {{c2::restart}}	Needs a managed identity with read access to the vault granted first.	ai200::containers cloze retake1
+Mark a site container as the externally-reachable one: az webapp sitecontainers create --container-name main-api --target-port 8080 --{{c1::is-main}}	Exactly one container per app should carry this flag; sidecars omit it.	ai200::containers cloze retake1
+Stream live container stdout/stderr from every instance of a running app: az webapp log {{c1::tail}} --name myapp -g myrg	Ctrl+C stops streaming; pair with the Kudu /Env page to check injected app settings.	ai200::containers cloze retake1
+Make an ACR push automatically restart the App Service app that runs it: az webapp deployment container config --{{c1::enable-cd}} true	Without this, pushing to the SAME tag again needs a manual restart to be picked up.	ai200::containers cloze retake1
+Grant a web app's managed identity pull access to a (non-ABAC) registry: az role assignment create --assignee &lt;principal-id&gt; --scope &lt;registry-id&gt; --role {{c1::AcrPull}}	On an ABAC-enabled registry use Container Registry Repository Reader instead.	ai200::containers cloze retake1
+# Text	Back Extra	tags — import with Cloze note type
+# ---------- retake batch: aca-aks (retake1) ----------
+Container Apps ingress transport that auto-detects HTTP/1 vs HTTP/2: {{c1::auto}} (default). Force raw TCP ingress with transport: {{c2::tcp}}	The other explicit value is http2.	ai200::containers cloze retake1
+Reactivate a deactivated Container Apps revision: az containerapp revision {{c1::activate}} --revision &lt;name&gt; -g &lt;rg&gt;	Sibling subcommands: deactivate, restart, copy, label.	ai200::containers cloze retake1
+Tag a revision with a stable name used in traffic rules: az containerapp revision {{c1::label add}} --label prod --revision &lt;name&gt;	label also supports remove and swap between two revisions.	ai200::containers cloze retake1
+Container Apps HTTP scale rule default: concurrentRequests = {{c1::10}}, recalculated every {{c2::15}} seconds.	Rate = requests in the past window / window length, not an instantaneous count.	ai200::containers cloze retake1
+Force a running Container Apps revision to pick up an updated secret: az containerapp {{c1::restart}} -n &lt;app&gt; -g &lt;rg&gt;	Or deploy a brand-new revision instead — either works.	ai200::containers cloze retake1
+Load every key of a ConfigMap as env vars in one shot: envFrom: - {{c1::configMapRef}}: name: app-settings	Use valueFrom.configMapKeyRef instead when you only need one key.	ai200::containers cloze retake1
+Kubernetes Service type that creates only a DNS CNAME-style alias with no load-balancing: {{c1::ExternalName}}	The other three are ClusterIP, NodePort, and LoadBalancer.	ai200::containers cloze retake1
+Enable KEDA on AKS {{c1::Standard}} via the managed add-on; on AKS {{c2::Automatic}} it is preconfigured already.	KEDA must be the only external metrics adapter installed either way.	ai200::containers cloze retake1
+Container Apps Job trigger for a nightly cron report: {{c1::Schedule}}. Trigger for starting via API on demand: {{c2::Manual}}	The third type, Event, fires executions from a KEDA-style scale rule.	ai200::containers cloze retake1
+List the modern EndpointSlice objects backing a Service named inference-api: kubectl get {{c1::endpointslices}} -l kubernetes.io/service-name=inference-api	Companion to the older kubectl get endpoints command.	ai200::containers cloze retake1
+# ---------- retake batch: cosmos (retake1) ----------
+Cosmos DB's default indexing policy indexes every property except the system path {{c1::_etag}}	<code>id</code> and <code>_ts</code> are always indexed too, but don't even appear in the policy JSON.	ai200::data cloze retake1
+A composite index path entry needs a direction: {{c1::ascending}} or {{c2::descending}}	ORDER BY with 2+ properties needs a composite index whose sequence and directions match (or are fully reversed).	ai200::data cloze retake1
+Cosmos DB vector index max dimensions: flat = {{c1::505}}, quantizedFlat/diskANN = {{c2::4096}}	A 3,072-dim embedding (text-embedding-3-large) can't use flat.	ai200::data cloze retake1
+quantizedFlat and diskANN both need at least {{c1::1,000}} vectors in a partition before the index is effective	Below that, Cosmos DB falls back to an exact brute-force scan (accuracy is fine, but you lose the RU/latency benefit of the approximate index) — it does NOT mean similarity results turn poor.	ai200::data cloze retake1
+The Cosmos DB change feed PROCESSOR library exists only for {{c1::.NET}} and {{c2::Java}}	Python and Node.js must use the pull model or the Functions trigger instead.	ai200::data cloze retake1
+Before enabling All-versions-and-deletes change feed mode, the account must already have {{c1::continuous backups}} (point-in-time restore) turned on	GA since June 2026; enablement itself can take up to 30 minutes.	ai200::data cloze retake1
+Cosmos DB consistency levels that cost {{c1::2x}} read RUs (2-replica quorum reads): Strong and {{c2::Bounded Staleness}}	Session, Consistent Prefix, and Eventual all read a single replica at 1x RU.	ai200::data cloze retake1
+Python index-metrics opt-in: query_items(..., {{c1::populate_index_metrics}}=True), then read headers['{{c2::x-ms-cosmos-index-utilization}}']	Separate from the RU-charge header x-ms-request-charge, which is always present.	ai200::data cloze retake1
+Cosmos DB SDK queries need BOTH the executeQuery data action and the {{c1::readChangeFeed}} data action on the RBAC role	Missing either one fails an ordinary query, even though you never touch the change feed.	ai200::data cloze retake1
+# Text	Back Extra	tags — import with Cloze note type
+# ---------- retake batch: pgvector (retake1) ----------
+Create an Azure-only ANN index built for 100M+ vectors: CREATE INDEX ON docs USING {{c1::diskann}} (embedding vector_cosine_ops);	No lists/probes to pick - tune with max_neighbors/l_value_ib (build) and l_value_is (query) instead.	ai200::data cloze retake1
+Guarantee distance-sorted results from a product-quantized DiskANN index: SET diskann.iterative_search = {{c1::strict_order}};	relaxed_order (default) may return rows out of exact distance order; off caps results at l_value_is regardless of LIMIT.	ai200::data cloze retake1
+Taxicab (L1) distance in pgvector has no dedicated operator like &lt;-&gt;/&lt;=&gt;/&lt;#&gt; - call the function instead: SELECT {{c1::l1_distance}}(embedding, '[1,2,3]') FROM docs;	L2 = &lt;-&gt;, cosine = &lt;=&gt;, inner product = &lt;#&gt; all have operators; L1 is function-only per the Azure pgvector how-to.	ai200::data cloze retake1
+Smaller, faster index for one filter value only: CREATE INDEX ON docs USING hnsw(embedding vector_cosine_ops) {{c1::WHERE status = 'published'}};	Only used when the query's WHERE clause matches this predicate form exactly.	ai200::data cloze retake1
+Tell the planner Azure's storage is SSD, not spinning disk, so it favors index scans: SET {{c1::random_page_cost}} = 1.1;	Default is 4.0 (tuned for HDDs); pair with effective_io_concurrency = 200 on SSD-backed Flexible Server.	ai200::data cloze retake1
+Enable the built-in connection pooler via CLI: az postgres flexible-server parameter set --name {{c1::pgbouncer.enabled}} --value true	Then reconnect on port 6432; General Purpose/Memory Optimized tiers only, not Burstable.	ai200::data cloze retake1
+Speed up containment filters on a JSONB metadata column: CREATE INDEX ON docs USING {{c1::gin}} (attributes);	Helps @&gt;, ?, ?| , ?&amp; - never helps a numeric range filter on a JSONB field.	ai200::data cloze retake1
+Cap how long a vector query may run: psycopg.connect(conninfo, options='-c statement_timeout={{c1::30000}}')	Milliseconds; 30s is a reasonable ceiling for vector similarity queries.	ai200::data cloze retake1
+HNSW indexes on a sparsevec column only support up to {{c1::1000}} non-zero elements per vector.	Exceeding it means reducing dimensionality or rethinking the index strategy.	ai200::data cloze retake1
+Production Postgres connections should set sslmode={{c1::verify-full}}, the only mode that validates both the CA and the server hostname.	require encrypts but skips cert checks; verify-ca checks the CA but not the hostname.	ai200::data cloze retake1
+# Text	Back Extra	tags — import with Cloze note type
+# ---------- retake batch: redis (retake1) ----------
+Default eviction policy: OSS Redis ships with {{c1::noeviction}}; Azure Managed Redis ships with {{c2::volatile-lru}}	Always confirm explicitly &mdash; don&#39;t assume either default.	ai200::data cloze retake1
+RediSearch module requires clustering policy {{c1::Enterprise}} and eviction policy {{c2::NoEviction}}		ai200::data cloze retake1
+OSS-clustering redis-py client: {{c1::RedisCluster}}.from_url(url); Enterprise/Non-clustered client: {{c2::redis.Redis}}.from_url(url)		ai200::data cloze retake1
+Azure Managed Redis port {{c1::10000}}; older Azure Cache for Redis port {{c2::6380}}		ai200::data cloze retake1
+SET key val with no KEEPTTL {{c1::discards}} any existing TTL; add the {{c2::KEEPTTL}} option to a SET to preserve it		ai200::data cloze retake1
+FLAT vector index: exact search, best under {{c1::10,000}} vectors; HNSW: approximate, query-time tuned via {{c2::EF_RUNTIME}}		ai200::data cloze retake1
+Pub/sub delivery is {{c1::at-most-once}} (fire-and-forget); Streams consumer-group delivery is tracked and retried via {{c2::XACK}} / the pending-entries list		ai200::data cloze retake1
+The Flash Optimized tier supports only the {{c1::RedisJSON}} module &mdash; RediSearch needs an {{c2::in-memory}} tier (Memory/Balanced/Compute Optimized)		ai200::data cloze retake1
+Distance metric for text embeddings: {{c1::COSINE}}; for image/spatial embeddings: {{c2::L2}}		ai200::data cloze retake1
+az {{c1::redisenterprise}} test-connection --name &lt;cache&gt; --resource-group &lt;rg&gt; checks connectivity; add {{c2::--auth entra}} to force Entra auth		ai200::data cloze retake1
+# ---------- retake batch: secrets-roles (retake1) ----------
+# Text	Back Extra	tags — import with Cloze note type
+Least-privilege role for a Function that only sends Service Bus messages: {{c1::Azure Service Bus Data Sender}}	Receiver = receive-only; Owner = full namespace access (send + receive + manage).	ai200::ops cloze retake1
+Functions host storage (AzureWebJobsStorage) needs {{c1::Storage Blob Data Owner}}, not just Contributor.	Needed for blob-lease singleton locks, e.g. the Timer trigger.	ai200::ops cloze retake1
+Assign a Cosmos DB data-plane role with {{c1::az cosmosdb sql role assignment create}}, not az role assignment create.	Cosmos DB for NoSQL's data-plane RBAC is native to the account, not standard Azure RBAC.	ai200::ops cloze retake1
+Key Vault's {{c1::SecretNearExpiry}} event fires {{c2::30}} days before a secret version's expiration date.	SecretExpired fires once that date passes; both are delivered through Event Grid.	ai200::ops cloze retake1
+Python App Configuration provider: refresh_interval defaults to {{c1::30}} seconds, minimum {{c2::1}} second.	secret_refresh_interval has no default; unset means Key Vault references are never periodically re-resolved on their own.	ai200::ops cloze retake1
+Load feature flags in the Python provider with {{c1::feature_flag_enabled}}=True.	Singular “flag”, not the plural feature_flags_enabled shown in some training samples — verified against the installed SDK source.	ai200::ops cloze retake1
+Create an App Configuration Key Vault reference via CLI: az appconfig kv set-keyvault --key OpenAI:ApiKey --secret-identifier {{c1::&lt;key-vault-secret-uri&gt;}}	Omit the version suffix on the secret URI so the reference always resolves the latest version.	ai200::ops cloze retake1
+Only {{c1::Key Vault Purge Operator}} (or the subscription owner) can purge a soft-deleted vault.	Purging is permanent and irreversible, a separate step from the initial soft-delete.	ai200::ops cloze retake1
+# Text<TAB>Back Extra<TAB>tags — import with Cloze note type
+# ---------- retake batch: otel-kql (retake1) ----------
+KQL p50/p95/p99 in one shot: dependencies | summarize {{c1::percentiles(duration, 50, 95, 99)}} by target | order by {{c2::percentile_duration_95}} desc	percentiles() (plural) emits one column per value, auto-named percentile_&lt;col&gt;_&lt;N&gt;.	ai200::ops cloze retake1
+KQL approximate distinct count: requests | summarize {{c1::dcount(user_Id)}} by cloud_RoleName	Probabilistic estimate — cheap at scale; count_distinct() is exact but expensive.	ai200::ops cloze retake1
+KQL explicit join (avoid the innerunique default): requests | join {{c1::kind=inner}} (dependencies) on operation_Id	Omit kind= and you silently get kind=innerunique (left side deduplicated first).	ai200::ops cloze retake1
+KQL inclusive numeric range filter: requests | where duration {{c1::between (1000 .. 5000)}}	Works on numeric, datetime, or timespan expressions.	ai200::ops cloze retake1
+KQL sampling-safe total: exceptions | summarize {{c1::sum(itemCount)}} by type	count() alone undercounts once ingestion sampling is active.	ai200::ops cloze retake1
+KQL gap-filled time series: requests | make-series {{c1::count()}} default={{c2::0}} on timestamp from ago(1d) to now() step 1h by cloud_RoleName	make-series fills empty buckets with the default value; summarize+bin() just omits them.	ai200::ops cloze retake1
+Azure Monitor connection string env var: export {{c1::APPLICATIONINSIGHTS_CONNECTION_STRING}}="InstrumentationKey=...;IngestionEndpoint=..."	Picked up automatically by configure_azure_monitor() — but code-provided values still win if both are set.	ai200::ops cloze retake1
+Cloud role name = {{c1::service.namespace}} + "." + {{c2::service.name}} (falls back to service.name alone if namespace is unset)	Via code: Resource.create() before configure_azure_monitor(). Via env vars: service.name uses its own OTEL_SERVICE_NAME; namespace/instance.id go in OTEL_RESOURCE_ATTRIBUTES="service.namespace=...,service.instance.id=...".	ai200::ops cloze retake1
+Manual error recording when you swallow an exception yourself: span.{{c1::record_exception}}(ex) then span.set_status(Status(StatusCode.{{c2::ERROR}}, "failed"))	Only needed if you catch it yourself — exceptions that propagate out of the span block are recorded automatically.	ai200::ops cloze retake1
+Querying a Log Analytics workspace directly (not the App Insights Logs blade): requests becomes {{c1::AppRequests}}, customMetrics becomes {{c2::AppMetrics}} (not AppCustomMetrics)	customEvents → AppEvents is the other naming trap.	ai200::ops cloze retake1
