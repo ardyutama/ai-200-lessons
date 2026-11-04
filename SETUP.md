@@ -65,14 +65,14 @@ kubectl cluster-info
 
 ## 5. Anki deck import (or build .apkg)
 
-Zero-tooling path: Anki → File → Import → pick the TSVs in `anki/`, map columns per [anki/README.md](anki/README.md).
-
-Nicer path (proper note types + tags baked in):
+Nicer path (recommended — proper note types + tags baked in):
 
 ```bash
 source .venv/bin/activate
 python anki/build_apkg.py   # writes anki/AI-200.apkg — double-click to import
 ```
+
+Zero-tooling path (fresh collection only — never on top of the apkg, it duplicates every Note): Anki → File → Import → pick the TSVs in `anki/`, map columns per [anki/README.md](anki/README.md).
 
 ## Verify you're ready
 
