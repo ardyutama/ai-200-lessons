@@ -1,6 +1,6 @@
 # 0001. Local-only exam prep on floci-az (no Azure subscription)
 
-**Status**: accepted (2026-09-30)
+**Status**: accepted (2026-09-30); reaffirmed 2026-11-04 for the 2026-11-14 retake — Event Grid and ACR (inside the Weak skills) stay theory-only
 
 The candidate has no Azure subscription and a 10-day runway to Exam AI-200. We decided that all hands-on practice runs locally: floci-az (28 emulated Azure services on :4577) as the Azure stand-in, plus local runtimes for what floci-az cannot emulate (Docker/kind for Kubernetes manifests, Jaeger for OpenTelemetry). Emulator Gaps (Event Grid, Container Apps, ACR, Managed Identity/RBAC, Azure Monitor) are covered by Cards and guided MS Learn reading only.
 
