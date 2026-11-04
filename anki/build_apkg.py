@@ -29,7 +29,7 @@ def load(tsv, model):
             f1, f2, tags = row[0], row[1], row[2].split()
             deck.add_note(genanki.Note(model=model, fields=[f1, f2], tags=tags))
             n += 1
-    print(f"{tsv}: {n} cards")
+    print(f"{tsv}: {n} notes")
 
 load("ai200-basic.tsv", BASIC_MODEL)
 load("ai200-cloze.tsv", CLOZE_MODEL)

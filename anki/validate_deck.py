@@ -16,6 +16,8 @@ Batch rules:
   - no duplicate Front (basic) / Text (cloze) across the whole corpus
   - batch rows: first tag is a domain tag ai200::{containers,data,integration,ops},
     last tag is 'retake1'
+  - every retake1 note carries at least one SPRINT_DAYS tag (anywhere in a repo
+    TSV or a batch TSV), so some day's filtered-deck search reaches it
   - HTML: no <br>; only <b>, </b>, <i>, </i>, <code>, </code> tags allowed;
     a raw '<' outside those tags is an error (tag-parsing hazard in Anki);
     a raw '>' is allowed (renders literally; repo-deck KQL convention)
@@ -32,6 +34,17 @@ import sys
 from pathlib import Path
 
 DOMAIN_TAGS = {"ai200::containers", "ai200::data", "ai200::integration", "ai200::ops"}
+# Round 3 sprint (PLAN.md): ISO date -> topic tags searched that day. Keep PLAN.md in
+# step with this; build_card_index.py reads it too.
+SPRINT_DAYS = {
+    "2026-11-05": ("servicebus", "eventgrid", "dlq"),
+    "2026-11-06": ("functions", "durable"),
+    "2026-11-07": ("acr", "appservice", "sidecar"),
+    "2026-11-08": ("aca", "keda", "aks"),
+    "2026-11-09": ("cosmos", "pgvector", "redis"),
+    "2026-11-10": ("keyvault", "appconfig", "roles", "otel", "kql"),
+}
+SPRINT_TAGS = {t for tags in SPRINT_DAYS.values() for t in tags}
 ALLOWED_TAGS = {"<b>", "</b>", "<i>", "</i>", "<code>", "</code>"}
 CLOZE_RE = re.compile(r"\{\{c(\d+)::(.+?)\}\}")
 
@@ -105,6 +118,9 @@ def validate_tsvs(repo_dir: Path, batch_paths: list) -> int:
             else:
                 seen[key] = f"{path.name}:{lineno}"
             tags = tagfield.split()
+            if "retake1" in tags and not SPRINT_TAGS.intersection(tags):
+                issues.append(f"{path.name}:{lineno}: retake1 note has no sprint-day tag "
+                              f"(add one of SPRINT_DAYS' tags)")
             if is_batch:
                 if not tags or tags[0] not in DOMAIN_TAGS:
                     issues.append(f"{path.name}:{lineno}: first tag not a domain tag: {tags[:1]}")
